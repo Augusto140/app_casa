@@ -649,7 +649,7 @@
                                     
                                     <div class="mb-3">
                                         <label class="form-label">Peso Diário (gramas)</label>
-                                        <input type="number" class="form-control" id="pesoDiario" min="0" step="1" required>
+                                        <input type="number" class="form-control" id="pesoDiario" min="0" step="0.01" required>
                                     </div>
                                     
                                     <div class="mb-3">
@@ -1743,7 +1743,7 @@ document.getElementById('configForm').addEventListener('submit', function(e) {
     const novoConfig = {
         horarioInicio: document.getElementById('horarioInicio').value,
         horarioFim: document.getElementById('horarioFim').value,
-        pesoDiario: parseInt(document.getElementById('pesoDiario').value),
+        pesoDiario: parseFloat(document.getElementById('pesoDiario').value),
         porcoes: parseInt(document.getElementById('porcoes').value),
         lancamentos: parseInt(document.getElementById('lancamentos').value),
         intervalo: parseInt(document.getElementById('intervalo').value),
