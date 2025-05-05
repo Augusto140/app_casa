@@ -359,7 +359,35 @@
 
 
 
+/* Adicione ao seu <style> */
+    .btn-limpar {
+    background: linear-gradient(145deg, #aaf3f7 0%, #aaf3f7 100%);
+    color: #2c3e50 !important;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 15px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
 
+.btn-limpar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    background: linear-gradient(145deg, #aaf3f7 0%, #aaf3f7 100%);
+}
+
+.btn-limpar:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.bi-eraser-fill {
+    font-size: 1.1em;
+    margin-right: 5px;
+}
 
     </style>
 </head>
@@ -722,6 +750,20 @@
                             Nenhum registro histórico encontrado
                         </div>
                     </div>
+                </div>
+                <!-- Dentro do modal-body do #horariosModal -->
+                <div class="card">
+                    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Histórico de Alimentações</h6>
+                        <div>
+                            <div id="total-racao" class="badge bg-light text-dark">Total: 0g</div>
+                            <!-- Botão Novo Aqui -->
+                            <button class="btn btn-limpar" onclick="limparHistorico()">
+                                🗑️ Limpar Histórico
+                            </button>
+                        </div>
+                    </div>
+                    <!-- ... resto do código do histórico ... -->
                 </div>
             </div>
         </div>
@@ -1801,7 +1843,8 @@ function atualizarListaHorarios(data) {
                             <span class="horario-hora">${p.hora.toString().padStart(2, '0')}:${p.minuto.toString().padStart(2, '0')}</span>
                             <span class="horario-porcao">Porção ${i + 1}</span>
                         </div>
-                        <span class="horario-peso">${p.peso.toFixed(2)}g</span>
+                        <!-- LINHA CORRIGIDA (ANTES: parseFloat(p.peso).toFixed(2)) -->
+                        <span class="horario-peso">${(Math.round(Number(p.peso) * 100) / 100).toFixed(2)}g</span>
                     </div>
                 `;
                 
@@ -1821,22 +1864,19 @@ function atualizarListaHorarios(data) {
 
         if (historicoData) {
             const historicoArray = Object.entries(historicoData)
-                .sort((a, b) => b[0].localeCompare(a[0])) // Ordena do mais recente
-                .slice(0, 50); // Limita a 50 registros
+                .sort((a, b) => b[0].localeCompare(a[0]))
+                .slice(0, 50);
 
             historicoArray.forEach(([timestamp, registro]) => {
                 try {
-                    // Processar timestamp
                     const [dataParte, horaParte] = timestamp.split('_');
                     const [ano, mes, dia] = dataParte.split('-');
                     const [hora, minuto, segundo] = horaParte.split('-');
 
-                    // Calcular total
                     if (registro.peso && !isNaN(registro.peso)) {
                         totalLiberado += parseFloat(registro.peso);
                     }
 
-                    // Criar elemento
                     const div = document.createElement('div');
                     div.className = 'list-group-item d-flex justify-content-between align-items-center';
                     
@@ -1846,7 +1886,8 @@ function atualizarListaHorarios(data) {
                             <span class="fw-bold">${hora}:${minuto}:${segundo}</span>
                             <span class="text-muted ms-2">${registro.tipo === 'manual' ? '✋ Manual' : '⏰ Agendado'}</span>
                         </div>
-                        <span class="badge bg-primary rounded-pill">${parseFloat(registro.peso).toFixed(2)}g</span>
+                        <!-- LINHA CORRIGIDA (ANTES: parseFloat(registro.peso).toFixed(2)) -->
+                        <span class="badge bg-primary rounded-pill">${(Math.round(Number(registro.peso) * 100) / 100).toFixed(2)}g</span>
                     `;
 
                     historicoContainer.appendChild(div);
@@ -1855,7 +1896,6 @@ function atualizarListaHorarios(data) {
                 }
             });
 
-            // Atualizar total
             totalElement.textContent = `Total: ${totalLiberado.toFixed(2)}g`;
             semHistoricoMsg.style.display = historicoArray.length === 0 ? 'block' : 'none';
         } else {
@@ -1866,7 +1906,6 @@ function atualizarListaHorarios(data) {
         semHistoricoMsg.style.display = 'block';
     });
 }
-
 function enviarRacaoManual() {
     const peso = document.getElementById('manualFeedInput').value;
     if (peso && peso > 0) {
@@ -1960,7 +1999,21 @@ function acionarMotor() {
         };
                 setInterval(atualizarTemperaturas, 3000);
                
-                
+                function limparHistorico() {
+    if (confirm('Tem certeza que deseja apagar todo o histórico? Esta ação é irreversível!')) {
+        firebase.database().ref('historico').remove()
+            .then(() => {
+                exibirNotificacao('Histórico limpo com sucesso!', 'success');
+                // Atualiza a lista imediatamente
+                document.getElementById('historico-ativacoes').innerHTML = '';
+                document.getElementById('total-racao').textContent = 'Total: 0g';
+                document.getElementById('sem-historico').style.display = 'block';
+            })
+            .catch((error) => {
+                exibirNotificacao('Erro ao limpar histórico: ' + error.message, 'danger');
+            });
+    }
+}              
 
 
 
