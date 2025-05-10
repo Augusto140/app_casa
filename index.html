@@ -754,10 +754,11 @@
                 <!-- Dentro do modal-body do #horariosModal -->
                 <div class="card">
                     <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                        
-                        <div>
+                        <div class="d-flex gap-3"> <!-- Bootstrap gap + CSS personalizado -->
+                            <button class="btn btn-limpar" onclick="baixarHistorico()">
+                                📥 Baixar Histórico
+                            </button>
                             
-                            <!-- Botão Novo Aqui -->
                             <button class="btn btn-limpar" onclick="limparHistorico()">
                                 🗑️ Limpar Histórico
                             </button>
@@ -769,6 +770,7 @@
         </div>
     </div>
 </div>
+
                 <!-- Modal de Calibração -->
         <div class="modal fade" id="calibracaoModal" tabindex="-1" aria-labelledby="calibracaoModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -844,7 +846,123 @@
             </div>
          
 </div>
+<!-- Adicione este código após o modal de horários existente -->
+
+<!-- Modal do Ventilador -->
+<div class="modal fade" id="ventiladorModal" tabindex="-1" aria-labelledby="ventiladorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="ventiladorModalLabel">🔄 Controle do Ventilador</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Controle Manual -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="card-title mb-0">Controle Manual</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="modoManualVentilador">
+                                    <label class="form-check-label" for="modoManualVentilador">Modo Manual</label>
+                                </div>
+                                
+                                <div id="controleManualContainer" style="display: none;">
+                                    <div class="d-flex justify-content-center gap-3 mb-3">
+                                        <button class="btn btn-success" id="ligarVentiladorBtn">Ligar Ventilador</button>
+                                        <button class="btn btn-danger" id="desligarVentiladorBtn">Desligar Ventilador</button>
+                                    </div>
+                                    
+                                    <div class="alert alert-warning">
+                                        <small>⚠️ No modo manual, o sistema automático é desativado. 
+                                        Você assume total controle do ventilador.</small>
+                                    </div>
+                                </div>
+                                
+                                <div id="statusVentilador" class="text-center mt-3">
+                                    <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
+                                    <span>Carregando status...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Configurações Automáticas -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="card-title mb-0">Configurações Automáticas</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="tempMaxVentilador" class="form-label">Temperatura Máxima (ºC)</label>
+                                    <input type="number" step="0.1" class="form-control" id="tempMaxVentilador">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="tempMinDesligar" class="form-label">Temperatura para Desligar (ºC)</label>
+                                    <input type="number" step="0.1" class="form-control" id="tempMinDesligar">
+                                </div>
+                                
+                                <button class="btn btn-success w-100" id="salvarConfigVentiladorBtn">
+                                    💾 Salvar Configurações
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Histórico de Operação -->
+                <div class="card">
+                    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Histórico de Operação</h5>
+                        <div>
+                            <button class="btn btn-sm btn-light" onclick="baixarHistoricoVentilador()">
+                                📥 Baixar
+                            </button>
+                            <button class="btn btn-sm btn-light" onclick="limparHistoricoVentilador()">
+                                🗑️ Limpar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Data/Hora</th>
+                                        <th>Estado</th>
+                                        <th>Modo</th>
+                                        <th>Temperatura</th>
+                                        <th>Duração</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historicoVentiladorBody">
+                                    <!-- Dados serão inseridos aqui -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="semHistoricoVentilador" class="text-center py-4 text-muted">
+                            Nenhum registro histórico encontrado
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
     </div>
+</div>
+
+<!-- Adicione um botão para abrir o modal (coloque junto com os outros botões) -->
+<button class="btn btn-warning" onclick="abrirVentiladorModal()">
+    🌬️ Controle do Ventilador
+</button>
+</div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
@@ -853,6 +971,8 @@
     <!-- Remova a linha anterior do ml-regression-multivariate-linear -->
     <script src="https://cdn.jsdelivr.net/npm/regression@2.0.1/dist/regression.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.2.0/math.min.js"></script>
+    <script>window.ignoreSourceMapWarning = true;</script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Scripts -->
     <script>
         // Controle da tela de abertura
@@ -2015,11 +2135,283 @@ function acionarMotor() {
     }
 }              
 
+// Adicione estas funções ao seu script
 
 
 
 
+function baixarHistorico() {
+    const ref = database.ref('historico');
+    
+    ref.once('value').then(snapshot => {
+        const data = snapshot.val();
+        if (!data) {
+            exibirNotificacao('Nenhum histórico para baixar!', 'warning');
+            return;
+        }
 
+        // Formatar dados para CSV
+        let csvContent = "Data,Hora,Quantidade (g),Tipo\n";
+        
+        Object.entries(data).forEach(([timestamp, registro]) => {
+            const [dataParte, horaParte] = timestamp.split('_');
+            const dataFormatada = dataParte.split('-').reverse().join('/');
+            const horaFormatada = horaParte.replace(/-/g, ':');
+            
+            csvContent += `${dataFormatada},${horaFormatada},${registro.peso.toFixed(2)},${registro.tipo}\n`;
+        });
+
+        // Criar arquivo
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.href = url;
+        link.download = `historico_alimentacao_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
+        link.click();
+        
+        URL.revokeObjectURL(url);
+        exibirNotificacao('Download do histórico iniciado!', 'success');
+    });
+}
+
+
+
+// Função para abrir o modal do ventilador
+function abrirVentiladorModal() {
+    const modal = new bootstrap.Modal(document.getElementById('ventiladorModal'));
+    
+    // Carregar configurações atuais
+    firebase.database().ref('ventilador').once('value').then(snapshot => {
+        const data = snapshot.val();
+        
+        // Configurar modo manual
+        const modoManual = data?.manual || false;
+        document.getElementById('modoManualVentilador').checked = modoManual;
+        toggleControleManual(modoManual);
+        
+        // Configurar status atual
+        atualizarStatusVentilador(data?.estado || false);
+        
+        // Carregar configurações automáticas
+        firebase.database().ref('alert_thresholds/estufa').once('value').then(thresholds => {
+            const valores = thresholds.val();
+            if (valores) {
+                document.getElementById('tempMaxVentilador').value = valores.max;
+                document.getElementById('tempMinDesligar').value = valores.min - 2; // 2°C abaixo do limite
+            }
+        }).catch(error => {
+            console.error("Erro ao carregar thresholds:", error);
+        });
+        
+        // Carregar histórico
+        carregarHistoricoVentilador();
+        
+        modal.show();
+    }).catch(error => {
+        exibirNotificacao('Erro ao carregar configurações do ventilador!', 'danger');
+        console.error(error);
+    });
+}
+
+// Alternar entre modo manual/automático
+function toggleControleManual(ativo) {
+    const container = document.getElementById('controleManualContainer');
+    if (container) {
+        container.style.display = ativo ? 'block' : 'none';
+        
+        // Atualizar no Firebase
+        firebase.database().ref('ventilador/manual').set(ativo)
+            .catch(error => console.error("Erro ao atualizar modo manual:", error));
+    }
+}
+
+// Atualizar visualização do status
+function atualizarStatusVentilador(ligado) {
+    const statusElement = document.getElementById('statusVentilador');
+    if (statusElement) {
+        const modoManual = document.getElementById('modoManualVentilador')?.checked || false;
+        statusElement.innerHTML = `
+            <div class="d-flex align-items-center justify-content-center gap-2">
+                <div class="rounded-circle bg-${ligado ? 'success' : 'danger'}" 
+                     style="width: 15px; height: 15px;"></div>
+                <span>Ventilador ${ligado ? 'LIGADO' : 'DESLIGADO'} - Modo ${modoManual ? 'MANUAL' : 'AUTOMÁTICO'}</span>
+            </div>
+        `;
+    }
+}
+
+// Carregar histórico do ventilador
+function carregarHistoricoVentilador() {
+    firebase.database().ref('ventilador/historico').once('value').then(snapshot => {
+        const data = snapshot.val();
+        const tbody = document.getElementById('historicoVentiladorBody');
+        const emptyMsg = document.getElementById('semHistoricoVentilador');
+        
+        if (tbody) tbody.innerHTML = '';
+        
+        if (data && Object.keys(data).length > 0) {
+            if (emptyMsg) emptyMsg.style.display = 'none';
+            
+            // Ordenar por timestamp (mais recente primeiro)
+            const historicoOrdenado = Object.entries(data)
+                .sort((a, b) => b[0].localeCompare(a[0]))
+                .slice(0, 50);
+            
+            historicoOrdenado.forEach(([timestamp, registro]) => {
+                try {
+                    const [dataParte, horaParte] = timestamp.split('_');
+                    const dataFormatada = dataParte.split('-').reverse().join('/');
+                    const horaFormatada = horaParte.replace(/-/g, ':');
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${dataFormatada} ${horaFormatada}</td>
+                        <td><span class="badge bg-${registro.estado === 'LIGADO' ? 'success' : 'danger'}">${registro.estado}</span></td>
+                        <td>${registro.modo || 'N/A'}</td>
+                        <td>${registro.temperatura ? registro.temperatura.toFixed(1) + '°C' : 'N/A'}</td>
+                        <td>${registro.duracao || 'N/A'}</td>
+                    `;
+                    if (tbody) tbody.appendChild(tr);
+                } catch (e) {
+                    console.error("Erro ao processar registro:", timestamp, e);
+                }
+            });
+        } else {
+            if (emptyMsg) emptyMsg.style.display = 'block';
+        }
+    }).catch(error => {
+        console.error("Erro ao carregar histórico:", error);
+        if (emptyMsg) emptyMsg.style.display = 'block';
+    });
+}
+
+// Baixar histórico em CSV
+function baixarHistoricoVentilador() {
+    firebase.database().ref('ventilador/historico').once('value').then(snapshot => {
+        const data = snapshot.val();
+        if (!data || Object.keys(data).length === 0) {
+            exibirNotificacao('Nenhum histórico para baixar!', 'warning');
+            return;
+        }
+
+        // Formatar dados para CSV
+        const csvLines = ["Data,Hora,Estado,Modo,Temperatura (ºC),Duração"];
+        
+        Object.entries(data)
+            .sort((a, b) => b[0].localeCompare(a[0]))
+            .forEach(([timestamp, registro]) => {
+                try {
+                    const [dataParte, horaParte] = timestamp.split('_');
+                    const dataFormatada = dataParte.split('-').reverse().join('/');
+                    const horaFormatada = horaParte.replace(/-/g, ':');
+                    
+                    csvLines.push(
+                        `"${dataFormatada}","${horaFormatada}","${registro.estado}","${registro.modo || ''}",` +
+                        `"${registro.temperatura?.toFixed(1) || ''}","${registro.duracao || ''}"`
+                    );
+                } catch (e) {
+                    console.error("Erro ao formatar registro:", timestamp, e);
+                }
+            });
+
+        // Criar arquivo
+        const blob = new Blob([csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `historico_ventilador_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        exibirNotificacao('Download do histórico iniciado!', 'success');
+    }).catch(error => {
+        exibirNotificacao('Erro ao baixar histórico: ' + error.message, 'danger');
+    });
+}
+
+// Limpar histórico
+function limparHistoricoVentilador() {
+    if (confirm('Tem certeza que deseja apagar todo o histórico do ventilador? Esta ação é irreversível!')) {
+        firebase.database().ref('ventilador/historico').remove()
+            .then(() => {
+                exibirNotificacao('Histórico do ventilador limpo com sucesso!', 'success');
+                const tbody = document.getElementById('historicoVentiladorBody');
+                if (tbody) tbody.innerHTML = '';
+                const emptyMsg = document.getElementById('semHistoricoVentilador');
+                if (emptyMsg) emptyMsg.style.display = 'block';
+            })
+            .catch((error) => {
+                exibirNotificacao('Erro ao limpar histórico: ' + error.message, 'danger');
+            });
+    }
+}
+
+// Configurar event listeners quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', () => {
+    // Elementos do DOM
+    const modoManualCheckbox = document.getElementById('modoManualVentilador');
+    const ligarBtn = document.getElementById('ligarVentiladorBtn');
+    const desligarBtn = document.getElementById('desligarVentiladorBtn');
+    const salvarConfigBtn = document.getElementById('salvarConfigVentiladorBtn');
+
+    // Verificar se os elementos existem antes de adicionar listeners
+    if (modoManualCheckbox) {
+        modoManualCheckbox.addEventListener('change', function() {
+            toggleControleManual(this.checked);
+        });
+    }
+    
+    if (ligarBtn) {
+        ligarBtn.addEventListener('click', function() {
+            firebase.database().ref('ventilador/estado').set(true)
+                .then(() => {
+                    exibirNotificacao('Ventilador ligado manualmente', 'success');
+                    atualizarStatusVentilador(true);
+                })
+                .catch(error => {
+                    exibirNotificacao('Erro ao ligar ventilador: ' + error.message, 'danger');
+                });
+        });
+    }
+    
+    if (desligarBtn) {
+        desligarBtn.addEventListener('click', function() {
+            firebase.database().ref('ventilador/estado').set(false)
+                .then(() => {
+                    exibirNotificacao('Ventilador desligado manualmente', 'success');
+                    atualizarStatusVentilador(false);
+                })
+                .catch(error => {
+                    exibirNotificacao('Erro ao desligar ventilador: ' + error.message, 'danger');
+                });
+        });
+    }
+    
+    if (salvarConfigBtn) {
+        salvarConfigBtn.addEventListener('click', function() {
+            const tempMax = parseFloat(document.getElementById('tempMaxVentilador')?.value);
+            const tempMinDesligar = parseFloat(document.getElementById('tempMinDesligar')?.value);
+            
+            if (isNaN(tempMax) || isNaN(tempMinDesligar)) {
+                exibirNotificacao('Insira valores numéricos válidos!', 'warning');
+                return;
+            }
+            
+            firebase.database().ref('alert_thresholds/estufa').update({
+                max: tempMax,
+                min: tempMinDesligar
+            }).then(() => {
+                exibirNotificacao('Configurações do ventilador salvas!', 'success');
+            }).catch(error => {
+                exibirNotificacao('Erro ao salvar configurações: ' + error.message, 'danger');
+            });
+        });
+    }
+});
                 
     </script>
 </body>
