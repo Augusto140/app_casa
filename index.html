@@ -565,16 +565,16 @@
     <div class="text-center mt-4">
         <div class="d-flex flex-md-row flex-column justify-content-center gap-md-3 gap-2">
             <!-- Botões de Configuração -->
-            <button class="btn btn-primary mb-md-0 mb-2" onclick="abrirConfiguracoes()">
+            <button class="btn btn-aqua-gradient mb-md-0 mb-2" onclick="abrirConfiguracoes()">
                 ⚙️ Configurações do Alimentador
             </button>
-            <button class="btn btn-info mb-md-0 mb-2" onclick="mostrarHorarios()">
+            <button class="btn btn-aqua-gradient mb-md-0 mb-2" onclick="mostrarHorarios()">
                 🕒 Ver Horários Agendados
             </button>
             <button class="btn btn-aqua-gradient mb-md-0 mb-2" onclick="abrirVentiladorModal()">
                 🌀 Controle do Ventilador
             </button>
-            <button class="btn btn-secondary" onclick="abrirTermicoModal()">
+            <button class="btn btn-aqua-gradient mb-md-0 mb-2" onclick="abrirTermicoModal()">
                 🌡️ Parâmetros Térmicos
             </button>
         </div>
@@ -1432,7 +1432,13 @@ function baixarDados(tipo) {
                         .catch((error) => exibirNotificacao('Erro ao salvar: ' + error.message, 'danger'));
                 }
 
-                function verificarAlertas(data) {
+function verificarAlertas(data) {
+    // Certifique-se que alertThresholds está carregado
+    if (!alertThresholds) {
+        console.warn("Limites de alerta não carregados");
+        return;
+    }
+
     const cards = {
         agua: document.getElementById('temp1'),
         estufa: document.getElementById('temp2'),
@@ -1443,25 +1449,28 @@ function baixarDados(tipo) {
         const valor = data[`temperatura_${sensor === 'agua' ? 3 : sensor === 'estufa' ? 2 : 1}`];
         const card = cards[sensor];
 
-        // Adiciona a classe de alerta ao card
-        card.classList.toggle('sensor-alert', valor > alertThresholds[sensor].max || valor < alertThresholds[sensor].min);
+        if (card && alertThresholds[sensor]) {
+            const max = alertThresholds[sensor].max;
+            const min = alertThresholds[sensor].min;
+            
+            card.classList.toggle('sensor-alert', valor > max || valor < min);
 
-        let alertIcon = card.querySelector('.alert-icon');
-
-        if (card.classList.contains('sensor-alert')) {
-            // Se o ícone ainda não foi adicionado, cria ele
-            if (!alertIcon) {
-                alertIcon = document.createElement('span');
-                alertIcon.classList.add('alert-icon');
-                alertIcon.innerHTML = '⚠️'; // Ícone de alerta amarelo
-                card.prepend(alertIcon); // Adiciona antes do texto do card
+            let alertIcon = card.querySelector('.alert-icon');
+            if (card.classList.contains('sensor-alert')) {
+                if (!alertIcon) {
+                    alertIcon = document.createElement('span');
+                    alertIcon.classList.add('alert-icon');
+                    alertIcon.innerHTML = '⚠️';
+                    card.prepend(alertIcon);
+                }
+            } else {
+                if (alertIcon) alertIcon.remove();
             }
-        } else {
-            // Remove o ícone se ele existir
-            if (alertIcon) alertIcon.remove();
         }
     });
 }
+
+
 let historicalData = [];
 
 async function prepareData() {
@@ -2520,45 +2529,66 @@ function registrarEventoVentilador(estado, temperatura) {
 // Modifique a função para debugar
 function abrirTermicoModal() {
     try {
-        // Verifica se o Bootstrap está carregado
-        if (typeof bootstrap === 'undefined' || !bootstrap.Modal) {
-            throw new Error('Bootstrap não está carregado corretamente');
-        }
-
         const modalElement = document.getElementById('termicoModal');
-        
         if (!modalElement) {
             throw new Error('Elemento modal não encontrado');
         }
 
-        // Carrega valores (se necessário)
-        if (!localStorage.getItem('configTermica')) {
-            const defaultConfig = {
-                maxAgua: 28.0,
-                minAgua: 22.0,
-                maxEstufa: 30.0,
-                minEstufa: 24.0,
-                maxExterno: 35.0,
-                minExterno: 18.0
-            };
-            localStorage.setItem('configTermica', JSON.stringify(defaultConfig));
-        }
+        // Carrega valores do Firebase (com fallback para localStorage)
+        firebase.database().ref('alert_thresholds').once('value')
+            .then((snapshot) => {
+                let config = snapshot.val();
+                
+                // Se não tiver no Firebase, tenta carregar do localStorage
+                if (!config) {
+                    const localConfig = localStorage.getItem('configTermica');
+                    if (localConfig) {
+                        config = JSON.parse(localConfig);
+                    } else {
+                        // Valores padrão
+                        config = {
+                            agua: { max: 28.0, min: 22.0 },
+                            estufa: { max: 30.0, min: 24.0 },
+                            externa: { max: 35.0, min: 18.0 }
+                        };
+                    }
+                }
 
-        const config = JSON.parse(localStorage.getItem('configTermica'));
-        $('#maxAgua').val(config.maxAgua);
-        $('#minAgua').val(config.minAgua);
-        $('#maxEstufa').val(config.maxEstufa);
-        $('#minEstufa').val(config.minEstufa);
-        $('#maxExterno').val(config.maxExterno);
-        $('#minExterno').val(config.minExterno);
+                // Preenche os campos
+                $('#maxAgua').val(config.agua?.max || 28.0);
+                $('#minAgua').val(config.agua?.min || 22.0);
+                $('#maxEstufa').val(config.estufa?.max || 30.0);
+                $('#minEstufa').val(config.estufa?.min || 24.0);
+                $('#maxExterno').val(config.externa?.max || 35.0);
+                $('#minExterno').val(config.externa?.min || 18.0);
 
-        // Abre o modal
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
+                // Abre o modal
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            })
+            .catch((error) => {
+                console.error("Erro ao carregar do Firebase:", error);
+                // Tenta carregar do localStorage em caso de erro
+                const localConfig = localStorage.getItem('configTermica');
+                if (localConfig) {
+                    const config = JSON.parse(localConfig);
+                    $('#maxAgua').val(config.maxAgua);
+                    $('#minAgua').val(config.minAgua);
+                    $('#maxEstufa').val(config.maxEstufa);
+                    $('#minEstufa').val(config.minEstufa);
+                    $('#maxExterno').val(config.maxExterno);
+                    $('#minExterno').val(config.minExterno);
+                    
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                } else {
+                    throw new Error('Não foi possível carregar as configurações');
+                }
+            });
 
     } catch (error) {
         console.error('Erro ao abrir modal térmico:', error);
-        alert('Erro ao abrir configurações térmicas: ' + error.message);
+        mostrarNotificacao('Erro ao abrir configurações térmicas: ' + error.message, "danger");
     }
 }
 // Função para validar as configurações térmicas
@@ -2612,32 +2642,42 @@ function salvarConfigTermica() {
 
     // Cria objeto com as configurações
     const configTermica = {
-        maxAgua: parseFloat($('#maxAgua').val()).toFixed(1),
-        minAgua: parseFloat($('#minAgua').val()).toFixed(1),
-        maxEstufa: parseFloat($('#maxEstufa').val()).toFixed(1),
-        minEstufa: parseFloat($('#minEstufa').val()).toFixed(1),
-        maxExterno: parseFloat($('#maxExterno').val()).toFixed(1),
-        minExterno: parseFloat($('#minExterno').val()).toFixed(1),
+        agua: {
+            max: parseFloat($('#maxAgua').val()).toFixed(1),
+            min: parseFloat($('#minAgua').val()).toFixed(1)
+        },
+        estufa: {
+            max: parseFloat($('#maxEstufa').val()).toFixed(1),
+            min: parseFloat($('#minEstufa').val()).toFixed(1)
+        },
+        externa: {
+            max: parseFloat($('#maxExterno').val()).toFixed(1),
+            min: parseFloat($('#minExterno').val()).toFixed(1)
+        },
         ultimaAtualizacao: new Date().toISOString()
     };
 
-    // Salva no localStorage
-    localStorage.setItem('configTermica', JSON.stringify(configTermica));
-
-    // Envia para o servidor (se necessário)
-    enviarParaServidor(configTermica);
-
-    // Fecha o modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('termicoModal'));
-    modal.hide();
-
-    // Mostra notificação
-    mostrarNotificacao("Configurações térmicas salvas com sucesso!", "success");
-
-    // Atualiza qualquer display que mostre essas configurações
-    atualizarDisplaysTermicos();
+    // Salva no Firebase
+    firebase.database().ref('alert_thresholds').set(configTermica)
+        .then(() => {
+            // Salva também no localStorage como fallback
+            localStorage.setItem('configTermica', JSON.stringify(configTermica));
+            
+            // Fecha o modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('termicoModal'));
+            modal.hide();
+            
+            // Mostra notificação
+            mostrarNotificacao("Configurações térmicas salvas com sucesso!", "success");
+            
+            // Atualiza displays
+            atualizarDisplaysTermicos();
+        })
+        .catch((error) => {
+            console.error("Erro ao salvar no Firebase:", error);
+            mostrarNotificacao("Erro ao salvar configurações no banco de dados!", "danger");
+        });
 }
-
 // Função auxiliar para enviar para o servidor (AJAX)
 function enviarParaServidor(config) {
     $.ajax({
