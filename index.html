@@ -389,6 +389,32 @@
     margin-right: 5px;
 }
 
+
+/* Adicione ao seu CSS */
+.btn-aqua-gradient {
+    background: linear-gradient(145deg, #7fc5fa 0%, #aaf3f7 100%);
+    color: #2c3e50;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-aqua-gradient:hover {
+    background: linear-gradient(145deg, #6cb4e8 0%, #99e3e7 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.btn-aqua-gradient:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+
+
     </style>
 </head>
 <body>
@@ -534,85 +560,113 @@
         </div>
                     
 
-        <div class="config-panel" id="configPanel">
-                <h4 class="text-center mb-4">Parâmetros de conforto Térmico</h4>
-                <div class="row">
-                    <!-- Configuração para Água -->
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Água</h5>
-                                <div class="mb-3">
-                                    <label>Máxima (°C)</label>
-                                    <input type="number" step="0.1" id="maxAgua" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label>Mínima (°C)</label>
-                                    <input type="number" step="0.1" id="minAgua" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Configuração para Ar Estufa -->
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Ar Estufa</h5>
-                                <div class="mb-3">
-                                    <label>Máxima (°C)</label>
-                                    <input type="number" step="0.1" id="maxEstufa" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label>Mínima (°C)</label>
-                                    <input type="number" step="0.1" id="minEstufa" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Configuração para Ar Externo -->
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Ar Externo</h5>
-                                <div class="mb-3">
-                                    <label>Máxima (°C)</label>
-                                    <input type="number" step="0.1" id="maxExterno" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label>Mínima (°C)</label>
-                                    <input type="number" step="0.1" id="minExterno" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-center mt-4">
-                    <button class="btn btn-primary" onclick="salvarConfig()">Salvar Configurações</button>
-                </div>
-                    <!-- Repita para os outros sensores -->
+<!-- Painel Principal -->
+<div class="config-panel" id="configPanel">
+    <div class="text-center mt-4">
+        <div class="d-flex flex-md-row flex-column justify-content-center gap-md-3 gap-2">
+            <!-- Botões de Configuração -->
+            <button class="btn btn-primary mb-md-0 mb-2" onclick="abrirConfiguracoes()">
+                ⚙️ Configurações do Alimentador
+            </button>
+            <button class="btn btn-info mb-md-0 mb-2" onclick="mostrarHorarios()">
+                🕒 Ver Horários Agendados
+            </button>
+            <button class="btn btn-aqua-gradient mb-md-0 mb-2" onclick="abrirVentiladorModal()">
+                🌀 Controle do Ventilador
+            </button>
+            <button class="btn btn-secondary" onclick="abrirTermicoModal()">
+                🌡️ Parâmetros Térmicos
+            </button>
+        </div>
+    </div>
+    
+    <!-- Notificação e Alertas -->
+    <div id="notification" class="alert alert-success mt-3" role="alert" style="display: none;"></div>
+    <div id="alertContainer" class="alert-container mt-3"></div>
+</div>
                 
 
-                    <!-- Notificação e Alertas -->
-                    <div id="notification" class="alert alert-success" role="alert"></div>
-                    <div id="alertContainer" class="alert-container"></div>
-                    <div class="text-center mt-4">
-                        <div class="d-flex flex-md-row flex-column justify-content-center gap-md-3 gap-2">
-                            <button class="btn btn-secondary mb-md-0 mb-2" onclick="abrirConfiguracoes()">
-                                ⚙️ Configurações do Alimentador
-                            </button>
-                            <button class="btn btn-info" onclick="mostrarHorarios()">
-                                🕒 Ver Horários Agendados
-                            </button>
-                        </div>
-                    </div>
-            </div>
-           <!-- Adicione esta seção após os cards de temperatura -->
+           
 
         </div>
           
         <a href="https://wa.me/+5519996058199" class="help-icon" target="_blank">
             <img src="ajuda.png" alt="Ajuda">
         </a>
+
+<!-- Novo Modal de Parâmetros Térmicos -->
+<div class="modal fade" id="termicoModal" tabindex="-1" aria-labelledby="termicoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="termicoModalLabel">🌡️ Parâmetros de Conforto Térmico</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Configuração para Água -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Água</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">Máxima (°C)</label>
+                                    <input type="number" step="0.1" id="maxAgua" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mínima (°C)</label>
+                                    <input type="number" step="0.1" id="minAgua" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Configuração para Ar Estufa -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Ar Estufa</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">Máxima (°C)</label>
+                                    <input type="number" step="0.1" id="maxEstufa" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mínima (°C)</label>
+                                    <input type="number" step="0.1" id="minEstufa" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Configuração para Ar Externo -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Ar Externo</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">Máxima (°C)</label>
+                                    <input type="number" step="0.1" id="maxExterno" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mínima (°C)</label>
+                                    <input type="number" step="0.1" id="minExterno" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle"></i> Estes parâmetros definem as faixas de temperatura ideais para o sistema.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="salvarConfigTermica()">Salvar Configurações</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
         
@@ -958,10 +1012,7 @@
     </div>
 </div>
 
-<!-- Adicione um botão para abrir o modal (coloque junto com os outros botões) -->
-<button class="btn btn-warning" onclick="abrirVentiladorModal()">
-    🌬️ Controle do Ventilador
-</button>
+
 </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
@@ -973,6 +1024,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.2.0/math.min.js"></script>
     <script>window.ignoreSourceMapWarning = true;</script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Certifique-se que o Bootstrap JS está carregado antes dos seus scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Carrega jQuery antes de seus scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Scripts -->
     <script>
         // Controle da tela de abertura
@@ -2412,7 +2468,213 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-                
+
+
+// Adicione esta função para registrar eventos do ventilador
+function registrarEventoVentilador(estado, temperatura) {
+    const agora = new Date();
+    const timestamp = `${agora.getFullYear()}-${(agora.getMonth()+1).toString().padStart(2,'0')}-${agora.getDate().toString().padStart(2,'0')}_${agora.getHours().toString().padStart(2,'0')}-${agora.getMinutes().toString().padStart(2,'0')}-${agora.getSeconds().toString().padStart(2,'0')}`;
+    
+    // Obter o último estado para calcular a duração
+    firebase.database().ref('ventilador/ultimoEvento').once('value').then(snapshot => {
+        const ultimoEvento = snapshot.val();
+        let duracao = 'N/A';
+        
+        if (ultimoEvento && ultimoEvento.estado !== estado && ultimoEvento.timestamp) {
+            // Calcular duração em minutos
+            const [dataParte, horaParte] = ultimoEvento.timestamp.split('_');
+            const [ano, mes, dia] = dataParte.split('-');
+            const [hora, minuto, segundo] = horaParte.split('-');
+            
+            const ultimaData = new Date(ano, mes-1, dia, hora, minuto, segundo);
+            duracao = ((agora - ultimaData) / 60000).toFixed(1) + ' min';
+        }
+        
+        // Registrar novo evento
+        const evento = {
+            estado: estado ? 'LIGADO' : 'DESLIGADO',
+            modo: document.getElementById('modoManualVentilador').checked ? 'MANUAL' : 'AUTOMATICO',
+            temperatura: temperatura || null,
+            duracao: duracao,
+            timestamp: timestamp
+        };
+        
+        // Salvar evento no histórico
+        firebase.database().ref(`ventilador/historico/${timestamp}`).set(evento);
+        
+        // Atualizar último evento
+        firebase.database().ref('ventilador/ultimoEvento').set(evento);
+    });
+}
+
+
+
+
+
+
+
+
+
+
+// Função para abrir o modal térmico
+// Modifique a função para debugar
+function abrirTermicoModal() {
+    try {
+        // Verifica se o Bootstrap está carregado
+        if (typeof bootstrap === 'undefined' || !bootstrap.Modal) {
+            throw new Error('Bootstrap não está carregado corretamente');
+        }
+
+        const modalElement = document.getElementById('termicoModal');
+        
+        if (!modalElement) {
+            throw new Error('Elemento modal não encontrado');
+        }
+
+        // Carrega valores (se necessário)
+        if (!localStorage.getItem('configTermica')) {
+            const defaultConfig = {
+                maxAgua: 28.0,
+                minAgua: 22.0,
+                maxEstufa: 30.0,
+                minEstufa: 24.0,
+                maxExterno: 35.0,
+                minExterno: 18.0
+            };
+            localStorage.setItem('configTermica', JSON.stringify(defaultConfig));
+        }
+
+        const config = JSON.parse(localStorage.getItem('configTermica'));
+        $('#maxAgua').val(config.maxAgua);
+        $('#minAgua').val(config.minAgua);
+        $('#maxEstufa').val(config.maxEstufa);
+        $('#minEstufa').val(config.minEstufa);
+        $('#maxExterno').val(config.maxExterno);
+        $('#minExterno').val(config.minExterno);
+
+        // Abre o modal
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+
+    } catch (error) {
+        console.error('Erro ao abrir modal térmico:', error);
+        alert('Erro ao abrir configurações térmicas: ' + error.message);
+    }
+}
+// Função para validar as configurações térmicas
+function validarConfigTermica() {
+    // Obtém todos os valores
+    const maxAgua = parseFloat($('#maxAgua').val());
+    const minAgua = parseFloat($('#minAgua').val());
+    const maxEstufa = parseFloat($('#maxEstufa').val());
+    const minEstufa = parseFloat($('#minEstufa').val());
+    const maxExterno = parseFloat($('#maxExterno').val());
+    const minExterno = parseFloat($('#minExterno').val());
+
+    // Validação básica
+    if (isNaN(maxAgua) || isNaN(minAgua) || isNaN(maxEstufa) || 
+        isNaN(minEstufa) || isNaN(maxExterno) || isNaN(minExterno)) {
+        mostrarNotificacao("Preencha todos os campos com valores numéricos válidos!", "danger");
+        return false;
+    }
+
+    // Validação de faixas (mínimo < máximo)
+    if (minAgua >= maxAgua) {
+        mostrarNotificacao("Temperatura mínima da água deve ser menor que a máxima!", "danger");
+        return false;
+    }
+
+    if (minEstufa >= maxEstufa) {
+        mostrarNotificacao("Temperatura mínima da estufa deve ser menor que a máxima!", "danger");
+        return false;
+    }
+
+    if (minExterno >= maxExterno) {
+        mostrarNotificacao("Temperatura mínima externa deve ser menor que a máxima!", "danger");
+        return false;
+    }
+
+    // Validações adicionais de limites físicos
+    if (maxAgua > 40 || minAgua < 10) {
+        mostrarNotificacao("Temperatura da água deve estar entre 10°C e 40°C!", "danger");
+        return false;
+    }
+
+    return true;
+}
+
+// Função para salvar as configurações térmicas
+function salvarConfigTermica() {
+    // Valida os dados antes de salvar
+    if (!validarConfigTermica()) {
+        return;
+    }
+
+    // Cria objeto com as configurações
+    const configTermica = {
+        maxAgua: parseFloat($('#maxAgua').val()).toFixed(1),
+        minAgua: parseFloat($('#minAgua').val()).toFixed(1),
+        maxEstufa: parseFloat($('#maxEstufa').val()).toFixed(1),
+        minEstufa: parseFloat($('#minEstufa').val()).toFixed(1),
+        maxExterno: parseFloat($('#maxExterno').val()).toFixed(1),
+        minExterno: parseFloat($('#minExterno').val()).toFixed(1),
+        ultimaAtualizacao: new Date().toISOString()
+    };
+
+    // Salva no localStorage
+    localStorage.setItem('configTermica', JSON.stringify(configTermica));
+
+    // Envia para o servidor (se necessário)
+    enviarParaServidor(configTermica);
+
+    // Fecha o modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('termicoModal'));
+    modal.hide();
+
+    // Mostra notificação
+    mostrarNotificacao("Configurações térmicas salvas com sucesso!", "success");
+
+    // Atualiza qualquer display que mostre essas configurações
+    atualizarDisplaysTermicos();
+}
+
+// Função auxiliar para enviar para o servidor (AJAX)
+function enviarParaServidor(config) {
+    $.ajax({
+        url: '/api/config-termica',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(config),
+        success: function(response) {
+            console.log('Configurações térmicas salvas no servidor', response);
+        },
+        error: function(error) {
+            console.error('Erro ao salvar no servidor:', error);
+            // Pode adicionar uma notificação opcional aqui
+        }
+    });
+}
+
+// Função para atualizar displays que mostram as configurações
+function atualizarDisplaysTermicos() {
+    // Implementação específica do seu sistema
+    console.log('Atualizando displays térmicos...');
+    // Exemplo: $('#display-temp-agua').text(`${minAgua}°C - ${maxAgua}°C`);
+}
+
+// Função para mostrar notificações
+function mostrarNotificacao(mensagem, tipo) {
+    const notification = $('#notification');
+    notification.removeClass('alert-success alert-danger alert-warning')
+               .addClass(`alert-${tipo}`)
+               .text(mensagem)
+               .fadeIn();
+
+    setTimeout(() => {
+        notification.fadeOut();
+    }, 5000);
+}
+
     </script>
 </body>
 </html>
