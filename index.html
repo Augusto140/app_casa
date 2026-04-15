@@ -198,12 +198,6 @@
             transform: scale(1.1);
         }
 
-
-
-
-
-
-
 /* Progress Bar Improvements */
 .progress {
     border-radius: 8px;
@@ -236,7 +230,6 @@
     width: 100%;
     margin: 2px 0;
 }
-
 
 /* Estilos da Calibração */
 #calibracaoModal .alert {
@@ -324,10 +317,6 @@
     text-align: center;
 }
 
-
-
-
-
 /*novo cardi alimentador manual */
 .btn-motor {
     transition: all 0.3s ease;
@@ -356,8 +345,6 @@
     width: 300px;
     height: 300px;
 }
-
-
 
 /* Adicione ao seu <style> */
     .btn-limpar {
@@ -389,7 +376,6 @@
     margin-right: 5px;
 }
 
-
 /* Adicione ao seu CSS */
 .btn-aqua-gradient {
     background: linear-gradient(145deg, #7fc5fa 0%, #aaf3f7 100%);
@@ -413,7 +399,65 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+/* Estilos para o controle de luzes */
+.luz-card {
+    background: linear-gradient(135deg, #fff9e6 0%, #ffe6b3 100%);
+    border-left: 5px solid #ffc107;
+}
 
+.luz-status {
+    font-size: 2em;
+    transition: all 0.3s ease;
+}
+
+.luz-status.ativa {
+    text-shadow: 0 0 10px #ffc107;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #ffc107;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
 
     </style>
 </head>
@@ -594,12 +638,12 @@
             <img src="ajuda.png" alt="Ajuda">
         </a>
 
-<!-- Novo Modal de Parâmetros Térmicos -->
+<!-- Novo Modal de Parâmetros Térmicos com Controle de Luzes -->
 <div class="modal fade" id="termicoModal" tabindex="-1" aria-labelledby="termicoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="termicoModalLabel">🌡️ Parâmetros de Conforto Térmico</h5>
+                <h5 class="modal-title" id="termicoModalLabel">🌡️ Parâmetros de Conforto Térmico e Controle de Luzes</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -650,6 +694,94 @@
                                 <div class="mb-3">
                                     <label class="form-label">Mínima (°C)</label>
                                     <input type="number" step="0.1" id="minExterno" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nova Seção: Controle de Luzes -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card luz-card">
+                            <div class="card-header bg-warning">
+                                <h5 class="card-title mb-0">💡 Controle de Iluminação</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- Luz 1 (Pino 27) -->
+                                    <div class="col-md-6 text-center">
+                                        <div class="p-3 border rounded">
+                                            <div class="luz-status" id="luz1Status">💡</div>
+                                            <h6>Luz 1 (Pino 27)</h6>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="modoManualLuz1">
+                                                <label class="form-check-label" for="modoManualLuz1">Modo Manual</label>
+                                            </div>
+                                            <div id="controleManualLuz1" style="display: none;">
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    <button class="btn btn-success btn-sm" onclick="controlarLuz(1, true)">
+                                                        🔆 Ligar
+                                                    </button>
+                                                    <button class="btn btn-danger btn-sm" onclick="controlarLuz(1, false)">
+                                                        💡 Desligar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div id="agendamentoLuz1" class="mt-2 p-2 bg-light rounded border">
+                                                <small class="text-muted d-block mb-1">Agendamento Automático</small>
+                                                <div class="row g-2 align-items-center justify-content-center">
+                                                    <div class="col-auto">
+                                                        <input type="time" class="form-control form-control-sm" id="luz1HoraLigar" onchange="salvarHorarioLuz(1, 'ligar')">
+                                                    </div>
+                                                    <div class="col-auto">às</div>
+                                                    <div class="col-auto">
+                                                        <input type="time" class="form-control form-control-sm" id="luz1HoraDesligar" onchange="salvarHorarioLuz(1, 'desligar')">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2">
+                                                <span class="badge" id="luz1EstadoBadge">Estado: Desligada</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Luz 2 (Pino 14) -->
+                                    <div class="col-md-6 text-center">
+                                        <div class="p-3 border rounded">
+                                            <div class="luz-status" id="luz2Status">💡</div>
+                                            <h6>Luz 2 (Pino 14)</h6>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="modoManualLuz2">
+                                                <label class="form-check-label" for="modoManualLuz2">Modo Manual</label>
+                                            </div>
+                                            <div id="controleManualLuz2" style="display: none;">
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    <button class="btn btn-success btn-sm" onclick="controlarLuz(2, true)">
+                                                        🔆 Ligar
+                                                    </button>
+                                                    <button class="btn btn-danger btn-sm" onclick="controlarLuz(2, false)">
+                                                        💡 Desligar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div id="agendamentoLuz2" class="mt-2 p-2 bg-light rounded border">
+                                                <small class="text-muted d-block mb-1">Agendamento Automático</small>
+                                                <div class="row g-2 align-items-center justify-content-center">
+                                                    <div class="col-auto">
+                                                        <input type="time" class="form-control form-control-sm" id="luz2HoraLigar" onchange="salvarHorarioLuz(2, 'ligar')">
+                                                    </div>
+                                                    <div class="col-auto">às</div>
+                                                    <div class="col-auto">
+                                                        <input type="time" class="form-control form-control-sm" id="luz2HoraDesligar" onchange="salvarHorarioLuz(2, 'desligar')">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2">
+                                                <span class="badge" id="luz2EstadoBadge">Estado: Desligada</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -845,7 +977,7 @@
                                     Se o sistema estiver vazio, utilize o botão 
                                     <span class="badge bg-info">⚡ Liberação Manual</span> 
                                     para preencher o mecanismo de alimentação
-                                </
+                                </li>
                             </ol>
                             <div class="text-center">
                                 <button class="btn btn-warning" onclick="iniciarEtapa(1)">Iniciar Calibração</button>
@@ -1801,6 +1933,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalElement = document.getElementById('calibracaoModal');
     modalCalibracao = new bootstrap.Modal(modalElement);
     
+    // Inicializar listeners das luzes
+    inicializarControleLuzes();
+    
     // Restante do seu código de inicialização...
 });        
 
@@ -1929,12 +2064,6 @@ function iniciarContagemRegressiva(segundos, elementId, callback) {
         }
     }, 1000);
 }
-
-
-
-
-
-
 
 
 // Variável global para configurações
@@ -2160,10 +2289,6 @@ function filtrarPorPeriodo(data, periodo) {
 }
 
 
-
-
-
-
 function acionarMotor() {
     firebase.database().ref('motor').set(1)
         .then(() => {
@@ -2174,6 +2299,135 @@ function acionarMotor() {
             exibirNotificacao('Erro ao acionar motor!', 'danger');
         });
 }
+
+// ==================== FUNÇÕES DE CONTROLE DAS LUZES ====================
+
+function inicializarControleLuzes() {
+    // Configurar listeners para os switches de modo manual
+    const modoManualLuz1 = document.getElementById('modoManualLuz1');
+    const modoManualLuz2 = document.getElementById('modoManualLuz2');
+    
+    if (modoManualLuz1) {
+        modoManualLuz1.addEventListener('change', function() {
+            const modoManual = this.checked;
+            firebase.database().ref('luzes/luz1/manual').set(modoManual);
+            toggleControleManualLuz(1, modoManual);
+        });
+    }
+    
+    if (modoManualLuz2) {
+        modoManualLuz2.addEventListener('change', function() {
+            const modoManual = this.checked;
+            firebase.database().ref('luzes/luz2/manual').set(modoManual);
+            toggleControleManualLuz(2, modoManual);
+        });
+    }
+    
+    // Monitorar mudanças no Firebase para as luzes
+    firebase.database().ref('luzes').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            // Atualizar Luz 1
+            if (data.luz1) {
+                const modoManual = data.luz1.manual || false;
+                const estado = data.luz1.estado || false;
+                const hLigar = data.luz1.horarioLigar || "06:00";
+                const hDesligar = data.luz1.horarioDesligar || "18:00";
+                
+                if (document.getElementById('modoManualLuz1')) {
+                    document.getElementById('modoManualLuz1').checked = modoManual;
+                    toggleControleManualLuz(1, modoManual);
+                }
+                if (document.getElementById('luz1HoraLigar')) document.getElementById('luz1HoraLigar').value = hLigar;
+                if (document.getElementById('luz1HoraDesligar')) document.getElementById('luz1HoraDesligar').value = hDesligar;
+                
+                atualizarEstadoLuzUI(1, estado, modoManual);
+            }
+            
+            // Atualizar Luz 2
+            if (data.luz2) {
+                const modoManual = data.luz2.manual || false;
+                const estado = data.luz2.estado || false;
+                const hLigar = data.luz2.horarioLigar || "06:00";
+                const hDesligar = data.luz2.horarioDesligar || "18:00";
+                
+                if (document.getElementById('modoManualLuz2')) {
+                    document.getElementById('modoManualLuz2').checked = modoManual;
+                    toggleControleManualLuz(2, modoManual);
+                }
+                if (document.getElementById('luz2HoraLigar')) document.getElementById('luz2HoraLigar').value = hLigar;
+                if (document.getElementById('luz2HoraDesligar')) document.getElementById('luz2HoraDesligar').value = hDesligar;
+                
+                atualizarEstadoLuzUI(2, estado, modoManual);
+            }
+        }
+    });
+}
+
+function salvarHorarioLuz(luzNum, tipo) {
+    const id = `luz${luzNum}Hora${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`;
+    const valor = document.getElementById(id).value;
+    const campo = tipo === 'ligar' ? 'horarioLigar' : 'horarioDesligar';
+    
+    firebase.database().ref(`luzes/luz${luzNum}/${campo}`).set(valor)
+        .then(() => exibirNotificacao(`Horário de ${tipo} da Luz ${luzNum} atualizado!`, 'success'))
+        .catch(error => exibirNotificacao(`Erro ao salvar horário: ${error.message}`, 'danger'));
+}
+
+function toggleControleManualLuz(luzNum, ativo) {
+    const containerManual = document.getElementById(`controleManualLuz${luzNum}`);
+    const containerAuto = document.getElementById(`agendamentoLuz${luzNum}`);
+    if (containerManual) {
+        containerManual.style.display = ativo ? 'block' : 'none';
+    }
+    if (containerAuto) {
+        containerAuto.style.display = ativo ? 'none' : 'block';
+    }
+}
+
+function controlarLuz(luzNum, ligar) {
+    const estado = ligar;
+    const luzRef = firebase.database().ref(`luzes/luz${luzNum}`);
+    
+    // Primeiro, verificar se está em modo manual
+    luzRef.child('manual').once('value').then(snapshot => {
+        const modoManual = snapshot.val();
+        
+        if (!modoManual) {
+            exibirNotificacao(`Modo manual da Luz ${luzNum} está desativado! Ative o modo manual primeiro.`, 'warning');
+            return;
+        }
+        
+        // Atualizar estado
+        luzRef.update({
+            estado: estado,
+            ultimaAlteracao: new Date().toISOString()
+        }).then(() => {
+            exibirNotificacao(`Luz ${luzNum} ${estado ? 'ligada' : 'desligada'} com sucesso!`, 'success');
+        }).catch(error => {
+            exibirNotificacao(`Erro ao controlar Luz ${luzNum}: ${error.message}`, 'danger');
+        });
+    });
+}
+
+function atualizarEstadoLuzUI(luzNum, estado, modoManual) {
+    const statusElement = document.getElementById(`luz${luzNum}Status`);
+    const badgeElement = document.getElementById(`luz${luzNum}EstadoBadge`);
+    
+    if (statusElement) {
+        statusElement.innerHTML = estado ? '💡✨' : '💡';
+        statusElement.classList.toggle('ativa', estado);
+    }
+    
+    if (badgeElement) {
+        const estadoTexto = estado ? 'Ligada' : 'Desligada';
+        const modoTexto = modoManual ? ' (Manual)' : ' (Automático)';
+        badgeElement.textContent = `Estado: ${estadoTexto}${modoTexto}`;
+        badgeElement.className = `badge ${estado ? 'bg-success' : 'bg-secondary'}`;
+    }
+}
+
+// ==================== FIM DAS FUNÇÕES DE LUZES ====================
 
         // Adicione no final do window.onload
         window.onload = function() {
@@ -2647,10 +2901,6 @@ function registrarEventoVentilador(estado, temperatura, modo) {
     });
 }
 
-
-
-
-
 // Função para formatar a duração de forma mais legível
 function formatarDuracao(segundos) {
     if (!segundos) return 'N/A';
@@ -2667,11 +2917,6 @@ function formatarDuracao(segundos) {
         return `${segs}s`;
     }
 }
-
-
-
-
-
 
 // Função para abrir o modal térmico
 // Modifique a função para debugar
@@ -2814,8 +3059,6 @@ function salvarConfigTermica() {
             mostrarNotificacao("Erro ao salvar configurações no banco de dados!", "danger");
         });
 }
-
-
 
 // Função auxiliar para enviar para o servidor (AJAX)
 function enviarParaServidor(config) {
